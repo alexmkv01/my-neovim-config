@@ -988,16 +988,6 @@ require('lazy').setup({
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
       vim.cmd.colorscheme 'tokyonight-night'
-
-      -- Enable transparency (toned down slightly, everywhere)
-      vim.cmd("highlight Normal guibg=none")
-      vim.cmd("highlight NonText guibg=none")
-      vim.cmd("highlight NormalNC guibg=none")
-      vim.cmd("highlight NormalSB guibg=none")
-      vim.cmd("highlight LineNr guibg=none")
-      vim.cmd("highlight SignColumn guibg=none")
-      vim.cmd("highlight NvimTreeNormal guibg=none")  -- for neo-tree
-      vim.cmd("highlight NvimTreeNormalNC guibg=none")
     end,
   },
 
@@ -1121,20 +1111,6 @@ require('lazy').setup({
       lazy = '💤 ',
     },
   },
-})
-
--- Enable transparency for the entire nvim interface with very light effect
-vim.api.nvim_create_autocmd("ColorScheme", {
-  callback = function()
-    vim.cmd("highlight Normal guibg=none")
-    vim.cmd("highlight NonText guibg=none")
-    vim.cmd("highlight NormalNC guibg=none")
-    vim.cmd("highlight NormalSB guibg=none")
-    vim.cmd("highlight LineNr guibg=none")
-    vim.cmd("highlight SignColumn guibg=none")
-    vim.cmd("highlight NvimTreeNormal guibg=none")  -- for neo-tree
-    vim.cmd("highlight NvimTreeNormalNC guibg=none")
-  end,
 })
 
 -- The line beneath this is called `modeline`. See `:help modeline`

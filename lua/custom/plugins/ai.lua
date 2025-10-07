@@ -74,7 +74,7 @@ return {
 					direction = 'float',
 					float_opts = {
 						border = 'curved',
-						winblend = 10,
+						winblend = 0,
 					},
 					on_open = function(term)
 						vim.cmd 'startinsert!'
