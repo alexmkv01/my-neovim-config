@@ -72,6 +72,7 @@ return {
 			if not float_term then
 				float_term = Terminal:new {
 					direction = 'float',
+					start_in_insert = true,
 					float_opts = {
 						border = 'curved',
 						winblend = 0,
