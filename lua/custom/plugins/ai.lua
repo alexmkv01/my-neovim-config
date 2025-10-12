@@ -2,14 +2,14 @@ return {
 	'akinsho/toggleterm.nvim',
 	version = '*',
 	config = function()
-		require('toggleterm').setup({
+		require('toggleterm').setup {
 			-- Default direction remains vertical to not affect crush terminal
 			hide_numbers = true,
 			start_in_insert = false,
 			insert_mappings = false,
 			terminal_mappings = false,
 			shade_terminals = false, -- Prevent darkening crush terminal
-		})
+		}
 
 		local Terminal = require('toggleterm.terminal').Terminal
 		local crush_term -- Declare crush_term here
@@ -86,7 +86,7 @@ return {
 		end
 
 		-- Auto-command to map esc in terminal mode to normal mode
-		vim.cmd('autocmd! TermOpen term://* tnoremap <buffer> <esc> <C-\\><C-n>')
+		vim.cmd 'autocmd! TermOpen term://* tnoremap <buffer> <esc> <C-\\><C-n>'
 
 		-- Keymaps for crush
 		vim.keymap.set('n', '<leader>ai', '<cmd>lua _CRUSH_TOGGLE()<CR>', { desc = 'Toggle Crush (Open/Close)' })
@@ -97,19 +97,14 @@ return {
 		vim.keymap.set({ 't' }, '<C-l>', '<C-\\><C-n><cmd>lua _CRUSH_FLIP_FOCUS_ANY_MODE()<CR>',
 			{ desc = 'Flip Focus (Terminal/Editor)' })
 
-		-- Keymaps with leader t prefix for toggleterm
-		vim.keymap.set('n', '<leader>tt', '<cmd>lua _G._float_toggle()<CR>', { desc = 'Toggle float terminal' })
-		vim.keymap.set('n', '<leader>ta', ':ToggleTermToggleAll<CR>', { desc = 'Toggle all terminals' })
-		vim.keymap.set('n', '<leader>tn', ':TermNew<CR>', { desc = 'New terminal' })
-		vim.keymap.set('n', '<leader>ts', ':TermSelect<CR>', { desc = 'Select terminal' })
-		vim.keymap.set('n', '<leader>tl', ':ToggleTermSendCurrentLine<CR>', { desc = 'Send current line to term' })
-		vim.keymap.set('v', '<leader>ts', ':ToggleTermSendVisualSelection<CR>', { desc = 'Send visual selection to term' })
-		vim.keymap.set('v', '<leader>tl', ':ToggleTermSendVisualLines<CR>', { desc = 'Send visual lines to term' })
-
 		-- Override ZZ to save all and quit all windows, closing crush/etc.
 		vim.keymap.set('n', 'ZZ', function()
-			if crush_term and crush_term:is_open() then crush_term:toggle() end
-			if float_term and float_term:is_open() then float_term:toggle() end
+			if crush_term and crush_term:is_open() then
+				crush_term:toggle()
+			end
+			if float_term and float_term:is_open() then
+				float_term:toggle()
+			end
 			-- Wipe out terminal buffers to avoid job running errors
 			for _, buf in ipairs(vim.api.nvim_list_bufs()) do
 				if vim.api.nvim_buf_is_loaded(buf) and vim.bo[buf].buftype == 'terminal' then
