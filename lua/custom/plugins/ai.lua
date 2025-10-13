@@ -85,8 +85,17 @@ return {
 			float_term:toggle()
 		end
 
-		-- Auto-command to map esc in terminal mode to normal mode
-		vim.cmd 'autocmd! TermOpen term://* tnoremap <buffer> <esc> <C-\\><C-n>'
+		-- Auto-command to map esc in terminal mode to normal mode, except for lazygit
+		vim.api.nvim_create_autocmd('TermOpen', {
+			pattern = 'term://*',
+			callback = function(args)
+				local bufnr = args.buf
+				local bufname = vim.api.nvim_buf_get_name(bufnr)
+				if not bufname:find('lazygit') then
+					vim.api.nvim_buf_set_keymap(bufnr, 't', '<esc>', '<C-\\><C-n>', { noremap = true, silent = true })
+				end
+			end
+		})
 
 		-- Keymaps for crush
 		vim.keymap.set('n', '<leader>ai', '<cmd>lua _CRUSH_TOGGLE()<CR>', { desc = 'Toggle Crush (Open/Close)' })
