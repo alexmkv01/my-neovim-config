@@ -30,6 +30,12 @@ return {
 						vim.cmd 'startinsert!'
 						vim.api.nvim_buf_set_name(term.bufnr, 'Crush')
 						vim.api.nvim_set_option_value('filetype', 'crush', { buf = term.bufnr })
+
+						local opts = { noremap = true, silent = true, buffer = term.bufnr }
+						-- <C-l> in Normal mode inside crush: flip focus
+						vim.keymap.set('n', '<C-l>', '<cmd>lua _CRUSH_FLIP_FOCUS_ANY_MODE()<CR>', opts)
+						-- <C-l> in Terminal mode inside crush: exit terminal mode to normal, then flip focus
+						vim.keymap.set('t', '<C-l>', '<C-\\><C-n><cmd>lua _CRUSH_FLIP_FOCUS_ANY_MODE()<CR>', opts)
 					end,
 					on_close = function()
 						vim.g.crush_bufnr = nil
@@ -102,10 +108,6 @@ return {
 
 		vim.keymap.set('n', '<C-l>', '<cmd>lua _CRUSH_FLIP_FOCUS_ANY_MODE()<CR>',
 			{ desc = 'Flip Focus (Editor/Crush)' })
-
-		vim.keymap.set({ 't' }, '<C-l>', '<C-\\><C-n><cmd>lua _CRUSH_FLIP_FOCUS_ANY_MODE()<CR>',
-			{ desc = 'Flip Focus (Terminal/Editor)' })
-
 		-- Override ZZ to save all and quit all windows, closing crush/etc.
 		vim.keymap.set('n', 'ZZ', function()
 			if crush_term and crush_term:is_open() then
