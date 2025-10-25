@@ -426,6 +426,42 @@ require('lazy').setup({
 
       -- [[ Configure Telescope ]]
       -- See `:help telescope` and `:help telescope.setup()`
+      local builtin = require 'telescope.builtin'
+      local action_state = require('telescope.actions.state')
+      local actions = require('telescope.actions')
+      local buffer_searcher
+
+      -- Custom function for buffers that handles deletion and refreshes the list
+      buffer_searcher = function()
+        builtin.buffers {
+          sort_mru = true,
+          ignore_current_buffer = true,
+          show_all_buffers = false,
+          attach_mappings = function(prompt_bufnr, map)
+            local refresh_buffer_searcher = function()
+              actions.close(prompt_bufnr)
+              -- Use vim.schedule to ensure the picker starts only after the previous one is fully closed
+              vim.schedule(buffer_searcher)
+            end
+
+            local delete_buf_and_stay = function()
+              local selection = action_state.get_selected_entry()
+              if selection and selection.bufnr then
+                -- Use nvim_buf_delete to force deletion and then refresh the picker
+                vim.api.nvim_buf_delete(selection.bufnr, { force = true })
+                refresh_buffer_searcher()
+              end
+            end
+
+            -- Delete single buffer on <C-d> and refresh the list to stay in the picker
+            map('n', '<C-d>', delete_buf_and_stay)
+            map('i', '<C-d>', delete_buf_and_stay)
+
+            return true
+          end,
+        }
+      end
+
       require('telescope').setup {
         -- You can put your default mappings / updates / etc. in here
         --  All the info you're looking for is in `:help telescope.setup()`
@@ -461,7 +497,7 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>fd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
       vim.keymap.set('n', '<leader>fr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>f.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
-      vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
+      vim.keymap.set('n', '<leader><leader>', buffer_searcher, { desc = '[ ] Find existing buffers' })
 
       -- Git pickers
       vim.keymap.set('n', '<leader>gc', builtin.git_commits, { desc = '[G]it [C]ommits' })
