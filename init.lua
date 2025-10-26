@@ -449,8 +449,8 @@ require('lazy').setup({
       -- [[ Configure Telescope ]]
       -- See `:help telescope` and `:help telescope.setup()`
       local builtin = require 'telescope.builtin'
-      local action_state = require('telescope.actions.state')
-      local actions = require('telescope.actions')
+      local action_state = require 'telescope.actions.state'
+      local actions = require 'telescope.actions'
       local buffer_searcher
 
       -- Custom function for buffers that handles deletion and refreshes the list
@@ -528,6 +528,23 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>gr', builtin.git_branches, { desc = '[G]it B[r]anches' })
       vim.keymap.set('n', '<leader>gs', builtin.git_status, { desc = '[G]it [S]tatus' })
       vim.keymap.set('n', '<leader>gt', builtin.git_stash, { desc = '[G]it s[t]ash' })
+      vim.keymap.set('n', '<leader>ds', function()
+        vim.schedule(function()
+          require('telescope.builtin').lsp_dynamic_workspace_symbols()
+        end)
+      end, { desc = '[D]ocs [S]ymbols (Workspace)' })
+      vim.keymap.set('n', '<leader>do', function()
+        vim.schedule(function()
+          require('telescope.builtin').lsp_document_symbols()
+        end)
+      end, { desc = '[D]ocs [O]utline (Current Buffer)' })
+      vim.keymap.set('n', '<leader>df', function()
+        vim.schedule(function()
+          require('telescope.builtin').lsp_document_symbols({
+            default_text = 'function',
+          })
+        end)
+      end, { desc = '[D]ocs [F]unctions (Current Buffer)' })
       vim.keymap.set('n', '<leader>/', function()
         -- You can pass additional configuration to Telescope to change the theme, layout, etc.
         builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
