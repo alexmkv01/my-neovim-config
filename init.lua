@@ -170,7 +170,7 @@ vim.o.foldlevelstart = 99
 vim.o.foldnestmax = 4
 vim.o.foldcolumn = '0'
 vim.o.fillchars = 'fold: ' -- Use space instead of dashes
-vim.o.foldtext = ''        -- Use default minimal fold text
+vim.o.foldtext = '' -- Use default minimal fold text
 
 -- if performing an operation that would fail due to unsaved changes in the buffer (like `:q`),
 -- instead raise a dialog asking if you wish to save the current file(s)
@@ -193,7 +193,7 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 --
 -- NOTE: This won't work in all terminal emulators/tmux/etc. Try your own mapping
 -- or just use <C-\><C-n> to exit terminal mode
-vim.keymap.set('t', '<Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
+vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
 -- TIP: Disable arrow keys in normal mode
 -- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
@@ -343,7 +343,7 @@ require('lazy').setup({
   -- Then, because we use the `opts` key (recommended), the configuration runs
   -- after the plugin has been loaded as `require(MODULE).setup(opts)`.
 
-  {                     -- Useful plugin to show you pending keybinds.
+  { -- Useful plugin to show you pending keybinds.
     'folke/which-key.nvim',
     event = 'VimEnter', -- Sets the loading event to 'VimEnter'
     opts = {
@@ -424,7 +424,7 @@ require('lazy').setup({
       { 'nvim-telescope/telescope-ui-select.nvim' },
 
       -- Useful for getting pretty icons, but requires a Nerd Font.
-      { 'nvim-tree/nvim-web-devicons',            enabled = vim.g.have_nerd_font },
+      { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
     },
     config = function()
       -- Telescope is a fuzzy finder that comes with a lot of different things that
@@ -540,9 +540,9 @@ require('lazy').setup({
       end, { desc = '[D]ocs [O]utline (Current Buffer)' })
       vim.keymap.set('n', '<leader>df', function()
         vim.schedule(function()
-          require('telescope.builtin').lsp_document_symbols({
+          require('telescope.builtin').lsp_document_symbols {
             default_text = 'function',
-          })
+          }
         end)
       end, { desc = '[D]ocs [F]unctions (Current Buffer)' })
       vim.keymap.set('n', '<leader>/', function()
@@ -594,7 +594,7 @@ require('lazy').setup({
       'WhoIsSethDaniel/mason-tool-installer.nvim',
 
       -- Useful status updates for LSP.
-      { 'j-hui/fidget.nvim',    opts = {} },
+      { 'j-hui/fidget.nvim', opts = {} },
 
       -- Allows extra capabilities provided by blink.cmp
       'saghen/blink.cmp',
@@ -678,8 +678,6 @@ require('lazy').setup({
           --  Useful when you're not sure what type a variable is and you want to see
           --  the definition of its *type*, not where it was *defined*.
           map('grt', require('telescope.builtin').lsp_type_definitions, '[G]oto [T]ype Definition')
-
-
 
           -- The following two autocommands are used to highlight references of the
           -- word under your cursor when your cursor rests there for a little while.
@@ -823,8 +821,8 @@ require('lazy').setup({
                 pylsp_mypy = {
                   enabled = true,
                   live_mode = false, -- Don't run on every keystroke
-                  dmypy = true,      -- Use daemon for faster checking
-                  strict = true,     -- Enable strict checking
+                  dmypy = true, -- Use daemon for faster checking
+                  strict = true, -- Enable strict checking
                 },
               },
             },
@@ -916,10 +914,10 @@ require('lazy').setup({
       -- for you, so that they are available from within Neovim.
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
-        'stylua',            -- Used to format Lua code
+        'stylua', -- Used to format Lua code
         'python-lsp-server', -- Python LSP for completions and language features
-        'ruff-lsp',          -- Python linting
-        'mypy',              -- Python type checking
+        'ruff-lsp', -- Python linting
+        'mypy', -- Python type checking
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -1050,27 +1048,27 @@ require('lazy').setup({
     config = function()
       require('catppuccin').setup {
         flavour = 'auto', -- latte, frappe, macchiato, mocha
-        background = {    -- :h background
+        background = { -- :h background
           light = 'latte',
           dark = 'mocha',
         },
         transparent_background = true, -- enables transparency, adjusted via terminal
         float = {
-          transparent = true,          -- enable transparent floating windows
-          solid = false,               -- use solid styling for floating windows, see |winborder|
+          transparent = true, -- enable transparent floating windows
+          solid = false, -- use solid styling for floating windows, see |winborder|
         },
-        show_end_of_buffer = false,    -- shows the '~' characters after the end of buffers
-        term_colors = false,           -- sets terminal colors (e.g. `g:terminal_color_0`)
+        show_end_of_buffer = false, -- shows the '~' characters after the end of buffers
+        term_colors = false, -- sets terminal colors (e.g. `g:terminal_color_0`)
         dim_inactive = {
-          enabled = false,             -- dims the background color of inactive window
+          enabled = false, -- dims the background color of inactive window
           shade = 'dark',
-          percentage = 0.15,           -- percentage of the shade to apply to the inactive window
+          percentage = 0.15, -- percentage of the shade to apply to the inactive window
         },
-        no_italic = false,             -- Force no italic
-        no_bold = false,               -- Force no bold
-        no_underline = false,          -- Force no underline
-        styles = {                     -- Handles the styles of general hi groups (see `:h highlight-args`):
-          comments = { 'italic' },     -- Change the style of comments
+        no_italic = false, -- Force no italic
+        no_bold = false, -- Force no bold
+        no_underline = false, -- Force no underline
+        styles = { -- Handles the styles of general hi groups (see `:h highlight-args`):
+          comments = { 'italic' }, -- Change the style of comments
           conditionals = { 'italic' },
           loops = {},
           functions = {},
@@ -1105,7 +1103,7 @@ require('lazy').setup({
         },
         color_overrides = {},
         custom_highlights = {
-          LineNr = { fg = '#74c7ec' },                    -- Sapphire blue for better contrast on line numbers
+          LineNr = { fg = '#74c7ec' }, -- Sapphire blue for better contrast on line numbers
           CursorLineNr = { fg = '#fab387', bold = true }, -- Peach orange and bold for current line
         },
         default_integrations = true,
@@ -1139,7 +1137,6 @@ require('lazy').setup({
       },
     },
   },
-
 
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
