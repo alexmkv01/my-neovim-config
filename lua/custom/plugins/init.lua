@@ -62,6 +62,8 @@ return {
   require 'custom.plugins.lazygit',
   require 'custom.plugins.octo',
   require 'custom.plugins.snacks',
+  require 'custom.plugins.breadcrumbs',
+
   {
     'https://git.sr.ht/~whynothugo/lsp_lines.nvim',
     config = function()
