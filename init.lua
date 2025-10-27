@@ -103,6 +103,7 @@ vim.o.number = true
 -- You can also add relative line numbers, to help with jumping.
 --  Experiment for yourself to see if you like it!
 vim.o.relativenumber = true
+vim.o.sessionoptions = 'blank,buffers,curdir,folds,help,tabpages,winsize'
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.o.mouse = 'a'
@@ -457,7 +458,7 @@ require('lazy').setup({
       buffer_searcher = function()
         builtin.buffers {
           sort_mru = true,
-          ignore_current_buffer = true,
+          ignore_current_buffer = false,
           show_all_buffers = false,
           attach_mappings = function(prompt_bufnr, map)
             local refresh_buffer_searcher = function()
@@ -477,7 +478,6 @@ require('lazy').setup({
 
             -- Delete single buffer on <C-d> and refresh the list to stay in the picker
             map('n', '<C-d>', delete_buf_and_stay)
-            map('i', '<C-d>', delete_buf_and_stay)
 
             return true
           end,
@@ -1221,7 +1221,7 @@ require('lazy').setup({
   require 'custom.plugins.dap-python',
   -- require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
-  -- require 'kickstart.plugins.autopairs',
+  require 'kickstart.plugins.autopairs',
   require 'kickstart.plugins.neo-tree',
   require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
@@ -1282,6 +1282,3 @@ require('lazy').setup({
     },
   },
 })
-
--- The line beneath this is called `modeline`. See `:help modeline`
--- vim: ts=2 sts=2 sw=2 et
