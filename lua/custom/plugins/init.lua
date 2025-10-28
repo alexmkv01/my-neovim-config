@@ -59,6 +59,7 @@ return {
       lint.linters_by_ft = lint.linters_by_ft or {}
     end,
   },
+  require 'custom.plugins.ai',
   require 'custom.plugins.lazygit',
   require 'custom.plugins.octo',
   require "custom.plugins.snacks",
