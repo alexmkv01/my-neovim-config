@@ -490,7 +490,18 @@ require('lazy').setup({
 				--  All the info you're looking for is in `:help telescope.setup()`
 				--
 				defaults = {
-					file_ignore_patterns = {},
+					file_ignore_patterns = {
+						'.github/',
+						'.dvc/',
+						'.dvcignore',
+						'.git/',
+						'.gitignore',
+						'node_modules/',
+						'__pycache__/',
+						'.pyc',
+						'.ruff_cache/',
+						'.mypy_cache/',
+					},
 					hidden = true,
 				},
 				pickers = {
