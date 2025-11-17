@@ -66,6 +66,7 @@ return {
   require "custom.plugins.breadcrumbs",
   require "custom.plugins.persistence",
   require "custom.plugins.markview",
+  require 'custom.plugins.leap',
 
   {
     'https://git.sr.ht/~whynothugo/lsp_lines.nvim',
