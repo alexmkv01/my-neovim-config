@@ -551,6 +551,9 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>fn', function()
         builtin.find_files { cwd = vim.fn.stdpath 'config' }
       end, { desc = '[S]earch [N]eovim files' })
+
+      -- Shift+Tab to cycle to next buffer (seamless buffer switching)
+      vim.keymap.set('n', '<S-Tab>', '<cmd>bnext<CR>', { desc = 'Next buffer' })
     end,
   },
 
