@@ -39,13 +39,13 @@ return {
             set_jumps = true,
             goto_next_start = {
               [']f'] = '@function.outer',
-              [']k'] = '@class.outer',
+              [']c'] = '@class.outer',
               [']o'] = '@loop.outer',
               [']i'] = '@conditional.outer',
             },
             goto_previous_start = {
               ['[f'] = '@function.outer',
-              ['[k'] = '@class.outer',
+              ['[c'] = '@class.outer',
               ['[o'] = '@loop.outer',
               ['[i'] = '@conditional.outer',
             },
@@ -64,14 +64,24 @@ return {
 
       -- Setup repeatable motions with ; and , (works for f/F/t/T movements)
       local ts_repeat_move = require 'nvim-treesitter.textobjects.repeatable_move'
-      vim.keymap.set({ 'n', 'x', 'o' }, ';', ts_repeat_move.repeat_last_move_next, { desc = 'Repeat last move (forward)' })
-      vim.keymap.set({ 'n', 'x', 'o' }, ',', ts_repeat_move.repeat_last_move_previous, { desc = 'Repeat last move (backward)' })
+      
+      -- ; repeats in same direction, , repeats in opposite direction
+      vim.keymap.set({ 'n', 'x', 'o' }, ';', ts_repeat_move.repeat_last_move, { desc = 'Repeat last move (same direction)' })
+      vim.keymap.set({ 'n', 'x', 'o' }, ',', ts_repeat_move.repeat_last_move_opposite, { desc = 'Repeat last move (opposite direction)' })
 
       -- Make builtin f/F/t/T also repeatable with ; and ,
       vim.keymap.set({ 'n', 'x', 'o' }, 'f', ts_repeat_move.builtin_f_expr, { expr = true })
       vim.keymap.set({ 'n', 'x', 'o' }, 'F', ts_repeat_move.builtin_F_expr, { expr = true })
       vim.keymap.set({ 'n', 'x', 'o' }, 't', ts_repeat_move.builtin_t_expr, { expr = true })
       vim.keymap.set({ 'n', 'x', 'o' }, 'T', ts_repeat_move.builtin_T_expr, { expr = true })
+      
+      -- Add diagnostic navigation with repeat support
+      local next_diagnostic_repeat, prev_diagnostic_repeat = ts_repeat_move.make_repeatable_move_pair(
+        vim.diagnostic.goto_next,
+        vim.diagnostic.goto_prev
+      )
+      vim.keymap.set('n', ']d', next_diagnostic_repeat, { desc = 'Next [d]iagnostic' })
+      vim.keymap.set('n', '[d', prev_diagnostic_repeat, { desc = 'Previous [d]iagnostic' })
     end,
   },
 }
