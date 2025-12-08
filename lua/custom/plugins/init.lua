@@ -74,4 +74,11 @@ return {
       require('lsp_lines').setup()
     end,
   },
+
+  {
+    'h3pei/copy-file-path.nvim',
+    config = function()
+      vim.keymap.set('n', '<leader>fp', ':CopyRelativeFilePath<CR>', { desc = '[F]ile [P]ath (copy relative)' })
+    end,
+  },
 }
