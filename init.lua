@@ -469,8 +469,22 @@ require('lazy').setup({
           },
           buffers = {
             mappings = {
-              i = { ['<c-d>'] = actions.delete_buffer },
-              n = { ['<c-d>'] = actions.delete_buffer },
+              i = {
+                ['<c-d>'] = actions.delete_buffer,
+                ['<c-s-d>'] = function(prompt_bufnr)
+                  -- Close all buffers
+                  actions.close(prompt_bufnr)
+                  vim.cmd 'bufdo bdelete'
+                end,
+              },
+              n = {
+                ['<c-d>'] = actions.delete_buffer,
+                ['<c-s-d>'] = function(prompt_bufnr)
+                  -- Close all buffers
+                  actions.close(prompt_bufnr)
+                  vim.cmd 'bufdo bdelete'
+                end,
+              },
             },
           },
           marks = {
@@ -553,14 +567,23 @@ require('lazy').setup({
       -- Shortcut for marks list
       vim.keymap.set('n', '<leader>ml', builtin.marks, { desc = '[M]arks [L]ist' })
 
-      -- Shift+Tab to cycle to next buffer in normal mode (prevents auto-entering terminal mode)
-      vim.keymap.set('n', '<S-Tab>', function()
+      -- Buffer navigation with H and L (previous/next)
+      -- Shift+Tab also cycles to next buffer
+      vim.keymap.set('n', 'H', function()
+        vim.g.skip_terminal_insert = true
+        vim.cmd 'bprevious'
+        vim.schedule(function()
+          vim.g.skip_terminal_insert = false
+        end)
+      end, { desc = 'Previous buffer' })
+
+      vim.keymap.set('n', 'L', function()
         vim.g.skip_terminal_insert = true
         vim.cmd 'bnext'
         vim.schedule(function()
           vim.g.skip_terminal_insert = false
         end)
-      end, { desc = 'Next buffer (stay in normal mode)' })
+      end, { desc = 'Next buffer' })
     end,
   },
 
