@@ -6,7 +6,12 @@ return {
     'nvim-tree/nvim-web-devicons',
   },
   config = function()
-    require('octo').setup()
+    require('octo').setup({
+      -- Explicitly configure gh_env to use GH_TOKEN
+      gh_env = {
+        GH_TOKEN = vim.env.GH_TOKEN,
+      },
+    })
 
     -- Keymaps for Octo commands
     local keymap = vim.keymap.set
