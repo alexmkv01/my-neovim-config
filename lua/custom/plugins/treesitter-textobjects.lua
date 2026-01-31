@@ -15,6 +15,9 @@ return {
               -- Class selection
               ['ac'] = '@class.outer',
               ['ic'] = '@class.inner',
+              -- Code cell selection (markdown) - use 'm' for consistency with ]m/[m
+              ['am'] = '@code_cell.outer',
+              ['im'] = '@code_cell.inner',
               -- Block selection
               ['ab'] = '@block.outer',
               ['ib'] = '@block.inner',
@@ -40,12 +43,14 @@ return {
             goto_next_start = {
               [']f'] = '@function.outer',
               [']c'] = '@class.outer',
+              [']m'] = '@code_cell.outer',
               [']o'] = '@loop.outer',
               [']i'] = '@conditional.outer',
             },
             goto_previous_start = {
               ['[f'] = '@function.outer',
               ['[c'] = '@class.outer',
+              ['[m'] = '@code_cell.outer',
               ['[o'] = '@loop.outer',
               ['[i'] = '@conditional.outer',
             },

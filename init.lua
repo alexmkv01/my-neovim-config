@@ -93,6 +93,14 @@ vim.g.maplocalleader = ' '
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
 
+-- Set Python3 host program for remote plugins (molten.nvim, etc.)
+vim.g.python3_host_prog = vim.fn.expand('~/.config/nvim/.venv/bin/python')
+
+-- Add luarocks paths for image.nvim magick dependency
+package.path = package.path .. ';' .. vim.fn.expand('~/.luarocks/share/lua/5.1/?.lua')
+package.path = package.path .. ';' .. vim.fn.expand('~/.luarocks/share/lua/5.1/?/init.lua')
+package.cpath = package.cpath .. ';' .. vim.fn.expand('~/.luarocks/lib/lua/5.1/?.so')
+
 -- [[ Setting options ]]
 -- See `:help vim.o`
 -- NOTE: You can change these options as you wish!
@@ -808,6 +816,7 @@ require('lazy').setup({
 
         -- Python LSP for completions, hover, go-to-definition, etc.
         pylsp = {
+          filetypes = { 'python', 'markdown' }, -- Support otter injected languages
           settings = {
             pylsp = {
               plugins = {
