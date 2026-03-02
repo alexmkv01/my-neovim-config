@@ -6,18 +6,17 @@ return {
     },
     config = function()
       local null_ls = require 'null-ls'
+      -- Only non-Python formatters here.
+      -- Python linting: ruff_lsp (single source of truth)
+      -- Python formatting: conform.nvim
       local sources = {
         null_ls.builtins.formatting.prettier.with { filetypes = { 'json', 'yaml', 'markdown' } },
         null_ls.builtins.formatting.shfmt.with { args = { '-i', '4' } },
-        -- Remove ruff_format as it conflicts with W292 (removes trailing newlines)
-        -- Only use ruff for diagnostics/linting
-        require 'none-ls.diagnostics.ruff',
       }
 
       local augroup = vim.api.nvim_create_augroup('LspFormatting', {})
       null_ls.setup {
         sources = sources,
-        -- Format on save (but not for Python - handled by ruff LSP)
         on_attach = function(client, bufnr)
           if client.server_capabilities.documentFormattingProvider then
             vim.api.nvim_clear_autocmds { group = augroup, buffer = bufnr }
@@ -25,7 +24,7 @@ return {
               group = augroup,
               buffer = bufnr,
               callback = function()
-                -- Skip formatting for Python files (handled by ruff LSP)
+                -- Skip formatting for Python files (handled by conform.nvim)
                 if vim.bo.filetype ~= 'python' then
                   vim.lsp.buf.format()
                 end
@@ -51,14 +50,7 @@ return {
       }
     end,
   },
-  {
-    'mfussenegger/nvim-lint',
-    event = { 'BufReadPre', 'BufNewFile' },
-    config = function()
-      local lint = require 'lint'
-      lint.linters_by_ft = lint.linters_by_ft or {}
-    end,
-  },
+  -- nvim-lint configured in kickstart/plugins/lint.lua (mypy only, ruff via ruff_lsp)
   require 'custom.plugins.lazygit',
   require 'custom.plugins.octo',
   require "custom.plugins.snacks",
@@ -70,6 +62,18 @@ return {
     'https://git.sr.ht/~whynothugo/lsp_lines.nvim',
     config = function()
       require('lsp_lines').setup()
+
+      -- Toggle lsp_lines on/off with <leader>tl
+      local lsp_lines_enabled = true
+      vim.keymap.set('n', '<leader>tl', function()
+        lsp_lines_enabled = not lsp_lines_enabled
+        vim.diagnostic.config {
+          virtual_lines = lsp_lines_enabled and { only_current_line = true } or false,
+        }
+        -- Force the lsp_lines show handler to re-run so it picks up the new config
+        -- and correctly sets up (or tears down) the CursorMoved autocmd.
+        vim.diagnostic.show()
+      end, { desc = '[T]oggle [L]SP lines diagnostics' })
     end,
   },
 

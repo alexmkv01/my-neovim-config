@@ -779,10 +779,7 @@ require('lazy').setup({
           },
         } or {},
         virtual_text = false,
-      }
-
-      vim.diagnostic.config {
-        virtual_lines = true,
+        virtual_lines = { only_current_line = true },
       }
 
       -- LSP servers and clients are able to communicate to each other what features they support.
@@ -815,25 +812,29 @@ require('lazy').setup({
         --
 
         -- Python LSP for completions, hover, go-to-definition, etc.
+        -- pylsp: used for completions, hover, go-to-definition via jedi.
+        -- All linting/diagnostics disabled here — ruff_lsp handles linting,
+        -- nvim-lint handles mypy. This avoids duplicate diagnostics.
         pylsp = {
           filetypes = { 'python', 'markdown' }, -- Support otter injected languages
           settings = {
             pylsp = {
               plugins = {
-                -- Disable formatting/linting plugins since we use ruff
+                -- Disable ALL formatting/linting/diagnostic plugins
+                -- Linting: handled by ruff_lsp
+                -- Type checking: handled by nvim-lint mypy (respects project configs)
+                -- Formatting: handled by conform.nvim
                 autopep8 = { enabled = false },
                 black = { enabled = false },
                 flake8 = { enabled = false },
-                pycodestyle = {
-                  enabled = true, -- Enable but configure to ignore E501
-                  ignore = { 'E501' },
-                  maxLineLength = 999,
-                },
+                pycodestyle = { enabled = false },
                 pyflakes = { enabled = false },
                 pylint = { enabled = false },
                 yapf = { enabled = false },
                 mccabe = { enabled = false },
-                -- Keep useful plugins enabled
+                pylsp_mypy = { enabled = false },
+                rope_completion = { enabled = false },
+                -- Keep jedi for completions, hover, goto, signatures
                 jedi_completion = {
                   enabled = true,
                   include_params = true,
@@ -843,45 +844,13 @@ require('lazy').setup({
                 jedi_references = { enabled = true },
                 jedi_signature_help = { enabled = true },
                 jedi_symbols = { enabled = true },
-                rope_completion = { enabled = false }, -- Use jedi instead
-                -- Enable mypy plugin for type checking
-                pylsp_mypy = {
-                  enabled = true,
-                  live_mode = false, -- Don't run on every keystroke
-                  dmypy = true, -- Use daemon for faster checking
-                  strict = true, -- Enable strict checking
-                },
               },
             },
           },
           on_attach = function(client, bufnr)
-            -- Disable formatting capability since we use ruff via conform.nvim
+            -- Disable formatting capability since we use conform.nvim
             client.server_capabilities.documentFormattingProvider = false
             client.server_capabilities.documentRangeFormattingProvider = false
-
-            -- Force configuration update after attach
-            client.config.settings = {
-              pylsp = {
-                plugins = {
-                  pycodestyle = {
-                    enabled = true,
-                    ignore = { 'E501' },
-                    maxLineLength = 999,
-                  },
-                  pyflakes = { enabled = false },
-                  mccabe = { enabled = false },
-                  pylint = { enabled = false },
-                  flake8 = { enabled = false },
-                  pylsp_mypy = {
-                    enabled = true,
-                    live_mode = false,
-                    dmypy = true,
-                    strict = true,
-                  },
-                },
-              },
-            }
-            client.notify('workspace/didChangeConfiguration', { settings = client.config.settings })
           end,
         },
 

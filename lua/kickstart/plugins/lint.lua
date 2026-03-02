@@ -1,121 +1,61 @@
 return {
 
-  { -- Linting
+  { -- Linting (mypy only — ruff linting handled by ruff_lsp)
     'mfussenegger/nvim-lint',
     event = { 'BufReadPre', 'BufNewFile' },
     config = function()
       local lint = require 'lint'
-      
-      -- Use default ruff configuration from nvim-lint
-      -- It already handles JSON output properly
-      
-      -- Mypy configuration - use global config for consistent strict checking
-      lint.linters.mypy.args = {
-        '--show-column-numbers',
-        '--show-error-end',
-        '--hide-error-context',
-        '--no-color-output',
-        '--no-error-summary',
-        '--no-pretty',
-        '--config-file=' .. vim.fn.expand('~/.config/nvim/mypy.ini'),
+
+      -- Override the mypy linter entirely with a custom definition.
+      -- Key change: cmd is a FUNCTION that dynamically resolves to the project's
+      -- .venv/bin/mypy (so it has access to dataframely, etc.), falling back to Mason's.
+      lint.linters.mypy = {
+        cmd = function()
+          local buf_path = vim.api.nvim_buf_get_name(0)
+          local dir = buf_path ~= '' and vim.fn.fnamemodify(buf_path, ':h') or vim.fn.getcwd()
+          while dir and dir ~= '/' do
+            local venv_mypy = dir .. '/.venv/bin/mypy'
+            if vim.uv.fs_stat(venv_mypy) then
+              return venv_mypy
+            end
+            dir = vim.fn.fnamemodify(dir, ':h')
+          end
+          return 'mypy'
+        end,
+        stdin = false,
+        stream = 'both',
+        ignore_exitcode = true,
+        args = {
+          '--show-column-numbers',
+          '--show-error-end',
+          '--hide-error-context',
+          '--no-color-output',
+          '--no-error-summary',
+          '--no-pretty',
+        },
+        parser = require('lint.parser').from_pattern(
+          '([^:]+):(%d+):(%d+):(%d+):(%d+): (%a+): (.*) %[(%a[%a-]+)%]',
+          { 'file', 'lnum', 'col', 'end_lnum', 'end_col', 'severity', 'message', 'code' },
+          {
+            error = vim.diagnostic.severity.ERROR,
+            warning = vim.diagnostic.severity.WARN,
+            note = vim.diagnostic.severity.HINT,
+          },
+          { ['source'] = 'mypy' },
+          { end_col_offset = 0 }
+        ),
       }
-      
+
       lint.linters_by_ft = {
         markdown = { 'markdownlint' },
-        python = { 'ruff', 'mypy' }, -- Enable both ruff and mypy
+        python = { 'mypy' }, -- ruff linting via ruff_lsp, not here
       }
 
-      -- To allow other plugins to add linters to require('lint').linters_by_ft,
-      -- instead set linters_by_ft like this:
-      -- lint.linters_by_ft = lint.linters_by_ft or {}
-      -- lint.linters_by_ft['markdown'] = { 'markdownlint' }
-      --
-      -- However, note that this will enable a set of default linters,
-      -- which will cause errors unless these tools are available:
-      -- {
-      --   clojure = { "clj-kondo" },
-      --   dockerfile = { "hadolint" },
-      --   inko = { "inko" },
-      --   janet = { "janet" },
-      --   json = { "jsonlint" },
-      --   markdown = { "vale" },
-      --   rst = { "vale" },
-      --   ruby = { "ruby" },
-      --   terraform = { "tflint" },
-      --   text = { "vale" }
-      -- }
-      --
-      -- You can disable the default linters by setting their filetypes to nil:
-      -- lint.linters_by_ft['clojure'] = nil
-      -- lint.linters_by_ft['dockerfile'] = nil
-      -- lint.linters_by_ft['inko'] = nil
-      -- lint.linters_by_ft['janet'] = nil
-      -- lint.linters_by_ft['json'] = nil
-      -- lint.linters_by_ft['markdown'] = nil
-      -- lint.linters_by_ft['rst'] = nil
-      -- lint.linters_by_ft['ruby'] = nil
-      -- lint.linters_by_ft['terraform'] = nil
-      -- lint.linters_by_ft['text'] = nil
-
-      -- Create autocommand which carries out the actual linting
-      -- on the specified events.
+      -- Run mypy on save and buffer enter (not on every keystroke)
       local lint_augroup = vim.api.nvim_create_augroup('lint', { clear = true })
-      vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWritePost', 'InsertLeave' }, {
+      vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWritePost' }, {
         group = lint_augroup,
         callback = function()
-          -- Only run the linter in buffers that you can modify in order to
-          -- avoid superfluous noise, notably within the handy LSP pop-ups that
-          -- describe the hovered symbol using Markdown.
-          if vim.bo.modifiable then
-            lint.try_lint()
-          end
-        end,
-      })
-    end,
-  },
-}
-
-      -- To allow other plugins to add linters to require('lint').linters_by_ft,
-      -- instead set linters_by_ft like this:
-      -- lint.linters_by_ft = lint.linters_by_ft or {}
-      -- lint.linters_by_ft['markdown'] = { 'markdownlint' }
-      --
-      -- However, note that this will enable a set of default linters,
-      -- which will cause errors unless these tools are available:
-      -- {
-      --   clojure = { "clj-kondo" },
-      --   dockerfile = { "hadolint" },
-      --   inko = { "inko" },
-      --   janet = { "janet" },
-      --   json = { "jsonlint" },
-      --   markdown = { "vale" },
-      --   rst = { "vale" },
-      --   ruby = { "ruby" },
-      --   terraform = { "tflint" },
-      --   text = { "vale" }
-      -- }
-      --
-      -- You can disable the default linters by setting their filetypes to nil:
-      -- lint.linters_by_ft['clojure'] = nil
-      -- lint.linters_by_ft['dockerfile'] = nil
-      -- lint.linters_by_ft['inko'] = nil
-      -- lint.linters_by_ft['janet'] = nil
-      -- lint.linters_by_ft['json'] = nil
-      -- lint.linters_by_ft['markdown'] = nil
-      -- lint.linters_by_ft['rst'] = nil
-      -- lint.linters_by_ft['ruby'] = nil
-      -- lint.linters_by_ft['terraform'] = nil
-      -- lint.linters_by_ft['text'] = nil
-
-      -- Create autocommand which carries out the actual linting
-      -- on the specified events.
-      local lint_augroup = vim.api.nvim_create_augroup('lint', { clear = true })
-      vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWritePost', 'InsertLeave' }, {
-        group = lint_augroup,
-        callback = function()
-          -- Only run the linter in buffers that you can modify in order to
-          -- avoid superfluous noise, notably within the handy LSP pop-ups that
-          -- describe the hovered symbol using Markdown.
           if vim.bo.modifiable then
             lint.try_lint()
           end
