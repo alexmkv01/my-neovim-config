@@ -1,9 +1,10 @@
 return {
   '3rd/image.nvim',
   version = '1.1.0', -- Pinned for stability with molten.nvim
-  cond = function()
-    return not vim.g.headless
-  end,
+  lazy = true,
+  -- Only load for Python files (for molten/jupyter), not on startup
+  ft = { 'python', 'markdown' },
+  enabled = false, -- Temporarily disabled due to terminal size issues
   opts = {
     backend = 'kitty',
     integrations = {
